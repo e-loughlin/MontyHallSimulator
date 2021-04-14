@@ -1,6 +1,6 @@
 
 
-
+from enum import Enum
 import random
 
 def randomizePrizeLocation():
@@ -12,22 +12,18 @@ def randomizePrizeLocation():
     else:
         prize_index = 2
 
-    doors = [1,1,1]
-    doors[prize_index] = 2
+    doors = [DoorState.CLOSED_NO_PRIZE,DoorState.CLOSED_NO_PRIZE,DoorState.CLOSED_NO_PRIZE]
+    doors[prize_index] = DoorState.CLOSED_WITH_PRIZE
 
     return doors
 
-wins = 0
-losses = 0
-games_played = 0
-
-class DoorState(enum):
+class DoorState(Enum):
     CLOSED_NO_PRIZE = 1
     CLOSED_WITH_PRIZE = 2
     OPEN_NO_PRIZE = 3
     OPEN_WITH_PRIZE = 4
 
-def printRollingStats():
+def printRollingStats(wins, losses, games_played):
     print("=========")
     print("Wins: {}".format(wins))
     print("Losses: {}".format(losses))
@@ -47,7 +43,11 @@ def printDoors(doorStates):
     print()
 
 
-def main()
+def main():
+    wins = 0
+    losses = 0
+    games_played = 0
+
     print("Monty Hall Simulator!")
     keep_playing = True
 
@@ -68,8 +68,9 @@ def main()
 
         print("OK! You've made selection {}. But wait! I'll open a different door...".format(selection))
         for i, doorState in enumerate(doors):
-            if doorState == DoorState.CLOSED_NO_PRIZE:
+            if doorState == DoorState.CLOSED_NO_PRIZE and i != selection - 1:
                 doors[i] = DoorState.OPEN_NO_PRIZE
+                break
 
         printDoors(doors)
         print("Would you like to switch doors? (y/n)")
@@ -101,15 +102,15 @@ def main()
             printDoors(doors)
             print("I'm sorry, you LOSE!")
 
-        # WINv
-        elif doors[selection-1] == DoorState.CLOSED_WITH_PRIZE
+        # WIN
+        elif doors[selection-1] == DoorState.CLOSED_WITH_PRIZE:
             doors[selection-1] = DoorState.OPEN_WITH_PRIZE
             win = True
             wins += 1
             printDoors(doors)
             print("You WIN!")
 
-        printRollingStats()
+        printRollingStats(wins, losses, games_played)
 
         print("Keep playing? (y/n)")
         keep_playing_response = input()
